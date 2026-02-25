@@ -1,0 +1,161 @@
+🟢 Tier 1 — FOUNDATION (mandatory)
+1️⃣ Clean REST API design
+
+What to do
+
+POST /shorten
+
+GET /{shortCode}
+
+Clear request/response models
+
+Signals
+
+Backend fundamentals
+
+API clarity
+
+Difficulty: ⭐
+Resume Value: ⭐⭐⭐⭐
+
+2️⃣ Deterministic & collision-safe short code generation
+
+What to do
+
+Base62 encoding
+
+ID counter or hash-based approach
+
+Collision handling
+
+Signals
+
+Correctness
+
+Design thinking
+
+Difficulty: ⭐⭐
+Resume Value: ⭐⭐⭐⭐
+
+3️⃣ Persistent storage
+
+What to do
+
+Use DB (SQLite / Postgres / Redis-like KV)
+
+Index on short code
+
+Signals
+
+DB modeling
+
+Real backend usage
+
+Difficulty: ⭐⭐
+Resume Value: ⭐⭐⭐
+
+4️⃣ Concurrency-safe request handling (Go)
+
+What to do
+
+Goroutines
+
+Mutex or atomic counters
+
+No race conditions
+
+Signals
+
+OS + Go concurrency
+
+Production awareness
+
+Difficulty: ⭐⭐⭐
+Resume Value: ⭐⭐⭐⭐
+
+🟡 Tier 2 — BIGTECH SIGNAL (this is where it becomes special)
+5️⃣ Token-bucket rate limiting
+
+What to do
+
+Per IP / client limit
+
+Reject bursts gracefully
+
+Signals
+
+Traffic control
+
+CN concepts
+
+Difficulty: ⭐⭐⭐
+Resume Value: ⭐⭐⭐⭐⭐
+
+6️⃣ In-memory caching for hot URLs
+
+What to do
+
+LRU cache
+
+Cache reads > DB reads
+
+Eviction strategy
+
+Signals
+
+Performance optimization
+
+System design
+
+Difficulty: ⭐⭐⭐
+Resume Value: ⭐⭐⭐⭐
+
+7️⃣ Health & readiness endpoints
+
+What to do
+
+/health
+
+/ready
+
+Signals
+
+Reliability thinking
+
+Difficulty: ⭐
+Resume Value: ⭐⭐⭐
+
+8️⃣ Load testing & benchmarking
+
+What to do
+
+Use wrk / hey
+
+Measure latency, throughput
+
+Identify bottlenecks
+
+Signals
+
+Performance engineering
+
+Real systems mindset
+
+Difficulty: ⭐⭐⭐
+Resume Value: ⭐⭐⭐⭐⭐
+
+🔵 Tier 3 — OPTIONAL (do max ONE)
+9️⃣ Graceful shutdown
+
+What to do
+
+Handle SIGTERM
+
+Finish in-flight requests
+
+Signals
+
+OS maturity
+
+Difficulty: ⭐⭐⭐
+Resume Value: ⭐⭐⭐⭐

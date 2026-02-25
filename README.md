@@ -59,8 +59,7 @@ Response
 ```bash
 url-shortener/
 ├── cmd/
-│   └── server/
-│       └── main.go              # App entrypoint
+│   └── main.go              # App entrypoint
 │
 ├── internal/
 │   ├── api/
