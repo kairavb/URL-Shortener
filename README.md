@@ -31,6 +31,7 @@ ShortCode Generator (atomic-safe)
 - Load / stress testing
 - Performance optimization
 - Metrics / Analytics
+- Restart consistency
 
 ## Endpoints
 
@@ -69,7 +70,8 @@ url-shortener/
 │   │
 │   ├── shortener/
 │   │   ├── generator.go         # Base62, ID counter
-│   │   └── generator_test.go
+│   │   ├── generator_test.go
+│   │   └── service.go
 │   │
 │   ├── storage/
 │   │   ├── store.go             # Interface

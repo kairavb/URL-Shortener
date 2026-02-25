@@ -2,9 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
+	"net/http"
 
+	"url-shortener/internal/api"
 	"url-shortener/internal/shortener"
 	"url-shortener/internal/storage"
 
@@ -30,19 +31,12 @@ func main() {
 	}
 
 	gen := shortener.NewGenerator(maxID)
+	service := shortener.NewService(gen, store)
 
-	shortCode := gen.Generate()
+	handler := api.NewHandler(service)
+	mux := http.NewServeMux()
+	api.RegisterRoutes(mux, handler)
 
-	err = store.Save(shortCode, "https://example.com")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	longURL, err := store.Get(shortCode)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Short:", shortCode)
-	fmt.Println("Long :", longURL)
+	log.Println("Server running on :8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
