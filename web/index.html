@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortner</title>
+    <title>URL Shortener</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh;
             background: linear-gradient(45deg, #d598ed, #7f11ad);
             color: white;
-            text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -20,34 +19,25 @@
         }
 
         h1 {
-            font-size: 5rem;
-            margin-bottom: 30px;
-            font-weight: bold;
-            letter-spacing: 2px;
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
-        
+
         form {
-            width: 100%;
-            margin-bottom: 50px;
-            margin-top: 50px;
+            width: min(600px, 90%);
+            margin: 2rem 0;
         }
 
         input {
             padding: 15px;
-            width: 70%;
+            width: 100%;
+            box-sizing: border-box;
             border-radius: 8px;
             border: 2px solid #fff;
             background: transparent;
             color: white;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            border-color: #d598ed;
-            outline: none;
-            box-shadow: 0 0 8px #d598ed;
+            font-size: 1rem;
+            margin-bottom: 1rem;
         }
 
         button {
@@ -56,37 +46,56 @@
             color: white;
             border: none;
             border-radius: 25px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         button:hover {
             background-color: #7f11ad;
-            transform: scale(1.05);
         }
 
-        p {
-            font-size: 1.4rem;
-            margin: 0px;
+        #result {
+            font-size: 1.2rem;
+            min-height: 1.5rem;
         }
+
         a {
             color: #fff;
-        }
-        a:hover {
-            color: #e2b8f3;
         }
     </style>
 </head>
 <body>
+    <h1>URL Shortener</h1>
 
-    <h1>GO URL Shortner</h1>
-    <form action="/" method="POST">
-        <input type="url" name="url" placeholder="Enter Long URL..." required>
-        <br>
-        <button type="submit">Short!</button>
+    <form id="form">
+        <input type="url" id="url" placeholder="Enter long URL..." required>
+        <button type="submit">Shorten</button>
     </form>
-    <p>Short URL: <a target="_blank" href="/{{ .url}}">{{ .url}}</a></p>
 
+    <p id="result"></p>
+
+    <script>
+        const form = document.getElementById("form");
+        const result = document.getElementById("result");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            result.textContent = "Shortening...";
+
+            const response = await fetch("/shorten", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: document.getElementById("url").value }),
+            });
+
+            if (!response.ok) {
+                result.textContent = "Could not shorten that URL.";
+                return;
+            }
+
+            const data = await response.json();
+            result.innerHTML = `Short URL: <a href="${data.short_url}" target="_blank">${data.short_url}</a>`;
+        });
+    </script>
 </body>
 </html>

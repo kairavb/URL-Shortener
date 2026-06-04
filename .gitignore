@@ -1,0 +1,31 @@
+# SQLite database (created at runtime)
+urls.db
+urls.db-wal
+urls.db-shm
+
+# Go build output
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test and coverage artifacts
+*.test
+*.out
+coverage/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local notes
+temp.txt

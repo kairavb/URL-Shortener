@@ -3,8 +3,6 @@ package storage
 import (
 	"database/sql"
 	"errors"
-
-	_ "modernc.org/sqlite"
 )
 
 type SQLiteStore struct {
@@ -16,21 +14,28 @@ func NewSQLiteStore(db *sql.DB) *SQLiteStore {
 }
 
 func (s *SQLiteStore) Init() error {
-	query := `
-	CREATE TABLE IF NOT EXISTS urls (
-		short_code TEXT PRIMARY KEY,
-		long_url TEXT NOT NULL
-	);
-	`
-	_, err := s.db.Exec(query)
+	// WAL mode allows concurrent reads while a write is in progress.
+	if _, err := s.db.Exec("PRAGMA journal_mode=WAL"); err != nil {
+		return err
+	}
+
+	_, err := s.db.Exec(`
+		CREATE TABLE IF NOT EXISTS urls (
+			short_code TEXT PRIMARY KEY,
+			long_url TEXT NOT NULL
+		);
+	`)
 	return err
 }
 
-func (s *SQLiteStore) Save(shortCode string, longURL string) error {
+func (s *SQLiteStore) Ping() error {
+	return s.db.Ping()
+}
+
+func (s *SQLiteStore) Save(shortCode, longURL string) error {
 	_, err := s.db.Exec(
 		"INSERT INTO urls(short_code, long_url) VALUES(?, ?)",
-		shortCode,
-		longURL,
+		shortCode, longURL,
 	)
 	return err
 }
@@ -45,7 +50,6 @@ func (s *SQLiteStore) Get(shortCode string) (string, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		return "", ErrNotFound
 	}
-
 	return longURL, err
 }
 
@@ -53,8 +57,8 @@ func (s *SQLiteStore) GetMaxID() (uint64, error) {
 	var maxShort string
 
 	err := s.db.QueryRow(`
-		SELECT short_code FROM urls 
-		ORDER BY rowid DESC 
+		SELECT short_code FROM urls
+		ORDER BY rowid DESC
 		LIMIT 1
 	`).Scan(&maxShort)
 
@@ -65,12 +69,11 @@ func (s *SQLiteStore) GetMaxID() (uint64, error) {
 		return 0, err
 	}
 
-	// Decode Base62 back to number
+	// Decode the last short code back to its numeric ID for counter recovery.
 	var id uint64
 	for i := 0; i < len(maxShort); i++ {
 		id = id*62 + uint64(indexOf(maxShort[i]))
 	}
-
 	return id, nil
 }
 
