@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -20,10 +21,8 @@ import (
 )
 
 const (
-	addr         = ":8080"
+	addr         = ":8081"
 	cacheSize    = 1000
-	ratePerSec   = 20
-	rateBurst    = 40
 	shutdownWait = 10 * time.Second
 )
 
@@ -56,6 +55,10 @@ func main() {
 	mux := http.NewServeMux()
 	api.RegisterRoutes(mux, handler, store)
 
+	// Override with RATE_PER_SEC / RATE_BURST env vars for load testing.
+	ratePerSec := envFloat("RATE_PER_SEC", 20)  // bucket refill rate
+	rateBurst := envFloat("RATE_BURST", 40)    // bucket capacity
+
 	// Outermost middleware runs first: rate limit, then request logging.
 	limiter := ratelimit.New(ratePerSec, rateBurst)
 	server := &http.Server{
@@ -82,4 +85,16 @@ func main() {
 	if err := server.Shutdown(ctx); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func envFloat(key string, fallback float64) float64 {
+	v := os.Getenv(key)
+	if v == "" {
+		return fallback
+	}
+	f, err := strconv.ParseFloat(v, 64)
+	if err != nil {
+		log.Fatalf("invalid %s: %v", key, err)
+	}
+	return f
 }

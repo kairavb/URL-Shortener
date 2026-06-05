@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${BASE_URL:-http://localhost:8080}"
+BASE_URL="${BASE_URL:-http://localhost:8081}"
 REQUESTS="${REQUESTS:-5000}"
 CONCURRENCY="${CONCURRENCY:-50}"
 
@@ -16,8 +16,13 @@ RESPONSE=$(curl -sf -X POST "$BASE_URL/shorten" \
   -d '{"url":"https://example.com/load-test"}')
 SHORT_CODE=$(echo "$RESPONSE" | sed -n 's/.*"short_code":"\([^"]*\)".*/\1/p')
 
+if [ -z "$SHORT_CODE" ]; then
+  echo "failed to create short URL, is the server running?"
+  exit 1
+fi
+
 echo "==> Redirect load test (cache hot path)"
-hey -n "$REQUESTS" -c "$CONCURRENCY" "$BASE_URL/$SHORT_CODE"
+hey -n "$REQUESTS" -c "$CONCURRENCY" -disable-redirects "$BASE_URL/$SHORT_CODE"
 
 echo
 echo "==> Shorten load test (write path)"
